@@ -1,113 +1,177 @@
-import Image from 'next/image'
+"use client";
+import { useEffect, useState } from "react";
+import SplashScreen from "@/app/components/SplashScreen";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { categories, liqours } from "../data";
+import HighlightCard from "@/app/components/HighlightCard";
+import CategoryCard from "@/app/components/CategoryCard";
+import PopularCard from "@/app/components/PopularCard";
+import ForYouCard from "@/app/components/ForYouCard";
+import Image from "next/image";
+import { useSession, signOut } from "next-auth/react";
+import {
+  ArrowRightOnRectangleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import Navigation from "./components/Navigation";
 
 export default function Home() {
+  const { data: session } = useSession();
+  const [open, setOpen] = useState(false);
+  const user = session?.user.validateUser.email;
+  console.log(user);
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "http://localhost:3000/login" });
+  };
+
+  useEffect(() => {
+    const splashScreenShown = localStorage.getItem("splashScreenShown");
+
+    if (!splashScreenShown) {
+      setOpen(true);
+    }
+  }, []);
+
+  const handleClick = () => {
+    setOpen(false);
+    localStorage.setItem("splashScreenShown", true);
+  };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className="relative h-full w-full ">
+      {open ? (
+        <div className="absolute w-full top-0 z-50 left-0 h-full bg-white">
+          <SplashScreen handleClick={handleClick} />
         </div>
-      </div>
+      ) : (
+        <div className="h-full relative ">
+          <Navigation />
+          <div className="relative h-full mt-[70px] px-5 py-8 md:px-12 ">
+            <div className="w-full md:w-[600px] md:mx-auto border-[0.2px] my-4 mb-4 md:my-8 flex rounded-2xl h-full border-gray-400 shadow-md items-center px-3">
+              <MagnifyingGlassIcon className="h-3 w-4 md:h-5 md:w-6  text-red-500 " />
+              <input
+                type="text"
+                className="outline-none border-none bg-transparent text-sm placeholder:text-xs md:placeholder:text-sm px-2 py-3 "
+                placeholder="Search for drinks..."
+                aria-label="search input"
+              />
+            </div>
+            <div className="mb-3 ">
+              <div>
+                <h1 className="font-light text-lg ">Hi, {user}</h1>
+                <h1 className="font-medium text-lg ">
+                  Find Your Favorite Drink
+                </h1>
+              </div>
+              <div className="flex items-center space-x-3 overflow-x-scroll no-scrollbar">
+                <HighlightCard />
+                <HighlightCard />
+                <HighlightCard />
+              </div>
+            </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+            <div className="">
+              <div className="flex items-center mb-3">
+                <div className="h-[0.8px] w-full bg-slate-400 flex-grow"></div>
+                <div className="">
+                  <h1 className="font-light flex-grow text-[10px] uppercase text-black">
+                    Categories
+                  </h1>
+                </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+                <div className="h-[0.8px] w-full bg-slate-400"></div>
+              </div>
+              <div className="mb-3">
+                <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-4">
+                  {categories?.map(({ title, image }, index) => (
+                    <CategoryCard title={title} key={index} image={image} />
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center mb-3">
+                <div className="h-[0.8px] w-full bg-slate-400 flex-grow"></div>
+                <div className="flex space-x-1">
+                  <h1 className="font-light flex-grow text-[10px] uppercase text-black">
+                    Popular
+                  </h1>
+                  <h1 className="font-light flex-grow text-[10px] uppercase text-black">
+                    Drinks
+                  </h1>
+                </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+                <div className="h-[0.8px] w-full bg-slate-400"></div>
+              </div>
+              <div className="mb-3">
+                <div className="flex items-center space-x-3 overflow-x-scroll no-scrollbar mt-1">
+                  {liqours?.map(({ image, title, amount, quantity }, index) => {
+                    return (
+                      <PopularCard
+                        key={index}
+                        image={image}
+                        title={title}
+                        amount={amount}
+                        quantity={quantity}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center mb-3">
+                <div className="h-[0.8px] w-full bg-slate-400 flex-grow"></div>
+                <div className="flex space-x-1">
+                  <h1 className="font-light flex-grow text-[10px] uppercase text-black">
+                    For
+                  </h1>
+                  <h1 className="font-light flex-grow text-[10px] uppercase text-black">
+                    You
+                  </h1>
+                </div>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
+                <div className="h-[0.8px] w-full bg-slate-400"></div>
+              </div>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+              <div>
+                <div className="mt-1 space-y-1">
+                  {liqours?.map(
+                    ({ image, title, amount, quantity, rating }, index) => {
+                      return (
+                        <ForYouCard
+                          key={index}
+                          image={image}
+                          title={title}
+                          amount={amount}
+                          quantity={quantity}
+                          rating={rating}
+                        />
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="relative h-32 md:h-[350px] mt-6 w-[90%] mx-auto rounded-lg ">
+                  <Image
+                    src="/images/raising-small.webp"
+                    alt="Liqour at Home"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="bg-gray-500 w-fit rounded-lg text-white px-3 py-2 flex items-center justify-center space-x-4 text-sm"
+            >
+              <p>SIGN OUT</p>
+
+              <p className="text-white">
+                <ArrowRightOnRectangleIcon className="h-5 w-5 text-white " />
+              </p>
+            </button>
+          </div>
+        </div>
+      )}
     </main>
-  )
+  );
 }
